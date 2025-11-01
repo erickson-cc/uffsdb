@@ -158,7 +158,12 @@ create_table: CREATE TABLE {setMode(OP_CREATE_TABLE);} table parentesis_open tab
 table_column_attr: column_create type attribute | column_create type attribute ',' table_column_attr;
 
 type: INTEGER {setColumnTypeCreate('I');}
-    | VARCHAR {setColumnTypeCreate('S');} parentesis_open NUMBER {setColumnSizeCreate(yylval.strval);} parentesis_close
+    | VARCHAR {setColumnTypeCreate('S');} parentesis_open NUMBER {
+    	long varcharSize = atol(yylval.strval);
+	if (varcharSize <= 0){
+		GLOBAL_PARSER.noerror=10;
+		}
+	setColumnSizeCreate(yylval.strval);} parentesis_close
     | DOUBLE {setColumnTypeCreate('D');};
     | CHAR {setColumnTypeCreate('C');};
 

@@ -301,7 +301,12 @@ int interface() {
                             }
                             break;
                         case OP_CREATE_TABLE:
-                            createTable(&GLOBAL_DATA);
+			    if(GLOBAL_PARSER.noerror==10){
+				    printf("Valor não permitido para tamanho do tipo varchar.\n");
+			    }
+			    else{
+				    createTable(&GLOBAL_DATA);
+			    }
                             break;
                         case OP_CREATE_DATABASE:
                             createDB(GLOBAL_DATA.objName);
