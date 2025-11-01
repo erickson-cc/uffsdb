@@ -1,0 +1,93 @@
+select * from local_corrida;
+create database teste;
+\c teste;
+drop table corrida;
+drop table corrida;
+\c uffsdb
+\
+\\
+\\
+\\\\
+\\\\\
+\\;
+\\\
+select * from corrida;
+;;;
+\;\;
+\\\\\\\\\\\\\\\\\\\
+\
+\
+\\
+\\
+\\\\
+\\\\
+\\\\
+\\\\\
+\\\\\
+\\\\\\
+\t
+\
+\\\
+\\\\
+\\\\\
+\\\\\\
+\t corrida;
+opa
+122
+12092
+opapsk
+\
+\\
+\\\
+\\\\
+\\\\
+poo
+\;
+//
+////
+\ select * from corrida;
+\\\\\ select * from corrida;
+select \ * from corrida;
+\\\\\\ select * from \\\\\ corrida;
+select * from \t corrida;
+\t corrida select * from corrida;
+\
+\\\
+\\\
+\\\\\
+\\\\\
+\\\\\\
+\\\\ select * from corrida;
+\d
+\
+\\
+\\\\
+select \\\ * from \\\ corrida;
+select * from corrida;
+.
+/
+\d \t corrida help
+\d \t corrida
+\t corrida
+create table teste (coluna1 integer, coluna2 integer, coluna3 integer, coluna4 integer, coluna5 integer, coluna6 integer, coluna7 integerer);
+create table teste (coluna1 integer, coluna2 integer, coluna3 integer, coluna4 integer, coluna5 integer, coluna6 integer, coluna7 integer);
+insert into teste(1,2,3,4,5,6,7.0);
+insert into teste values(1,2,3,4,5,6,7,9.0);
+insert into teste values(1,2,3,4,5,6,7.0);
+insert into teste values(1,2,3,4,5,6,7);
+insert into teste values(1,2,3,4,5,010201010102019291201029129120102912912912102010210219291922912);
+insert into teste values(1,2,3,4,5,6,10204);
+insert into teste values(1);
+insert into teste values(1024,1024,1024,1024,1024,1024,109029);
+seelct * from teste;
+select * from teste;
+select * from teste;
+\q
+\q
+\q
+help
+create table uepa (teste varchar(-10));
+\d
+\d
+select * from uepa;
+\q
