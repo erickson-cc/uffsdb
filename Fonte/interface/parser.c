@@ -110,6 +110,7 @@ void setColumnInsert(char **nome) {
     GLOBAL_PARSER.col_count++;
 }
 
+
 void setValueInsert(char *nome, char type) {
     int i;
     GLOBAL_DATA.values  = uffsRealloc(GLOBAL_DATA.values, (GLOBAL_PARSER.val_count+1)*sizeof(char *));
@@ -130,6 +131,10 @@ void setValueInsert(char *nome, char type) {
     GLOBAL_DATA.type[GLOBAL_PARSER.val_count] = type;
 
     GLOBAL_PARSER.val_count++;
+}
+
+void setUpdateValue(char *columnName, char *value, char type) {
+   //helper function do update team09 
 }
 
 void setColumnCreate(char **nome) {
@@ -293,6 +298,13 @@ int interface() {
                                 resultado = NULL;
                             }
                             break;
+                        case OP_UPDATE: //adicionei chutando team09
+                            resultado = handleTableOperation(&QUERY, 'u');
+                            if (resultado) {
+                                op_update(resultado, QUERY.tabela, &GLOBAL_DATA);
+                                resultado = NULL;
+                            }
+                            break;
                         case OP_DELETE:
                             resultado = handleTableOperation(&QUERY, 'd');
                             if (resultado && afterTrigger(resultado, &QUERY)) {
@@ -310,6 +322,9 @@ int interface() {
                             break;
                         case OP_CREATE_DATABASE:
                             createDB(GLOBAL_DATA.objName);
+                            break;
+                        case OP_UPDATE:
+                            // fazer alguma tratativa para o update
                             break;
                         case OP_DROP_TABLE:
                             excluirTabela(GLOBAL_DATA.objName);

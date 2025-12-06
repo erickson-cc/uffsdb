@@ -25,6 +25,7 @@
 (?i:WHERE)						return WHERE;
 (?i:DELETE)						return DELETE;
 (?i:CREATE)						return CREATE;
+(?i:UPDATE)						return UPDATE;
 (?i:TABLE)						return TABLE;
 (?i:ON)						    return ON;
 (?i:INDEX)						return INDEX;
