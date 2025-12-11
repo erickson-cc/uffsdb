@@ -103,6 +103,13 @@ int iniciaAtributos(struct fs_objects *, tp_table **, tp_buffer **, char *);
     Parametros: Nome da Tabela, Objeto da Tabela e tabela.
     Retorno:    tp_table
    ---------------------------------------------------------------------------------------------*/
+int atualizarTabela();
+/* ----------------------------------------------------------------------------------------------
+    Objetivo:   
+    Parametros: 
+    Retorno:    
+   ---------------------------------------------------------------------------------------------*/
+
 tp_table *abreTabela(char *, struct fs_objects *, tp_table **);
 /* createTable: Recebe uma estrutura contendo os parâmetros do CREATE TABLE
  *              e cria uma tabela no banco corrente

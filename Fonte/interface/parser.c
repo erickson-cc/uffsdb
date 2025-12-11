@@ -325,6 +325,7 @@ int interface() {
                             break;
                         case OP_UPDATE:
                             // fazer alguma tratativa para o update
+			    atualizarTabela(GLOBAL_DATA.objName);
                             break;
                         case OP_DROP_TABLE:
                             excluirTabela(GLOBAL_DATA.objName);

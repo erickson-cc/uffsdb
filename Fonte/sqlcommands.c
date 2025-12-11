@@ -1158,6 +1158,19 @@ int excluirTabela(char *nomeTabela) {
     printf("DROP TABLE\n");
     return SUCCESS;
 }
+/* ----------------------------------------------------------------------------------------------
+    Objetivo:   Função para ATUALIZAR de tabelas. (UPDATE)
+    Parametros: Objeto da Tabela, Nome da tabela (char), Objeto
+    Retorno:    
+                
+   ---------------------------------------------------------------------------------------------*/
+int atualizarTabela(char *nomeTabela, char *nomeCampo, char *valorCampo, char *campoCondicao, char *valorCondicao){
+	//Implementar abaixo a lógica
+	//UPDATE nomeTabela SET nomeCampo = valorCampo WHERE campoCondicao = valorCondicao
+	//
+
+	return 1;
+}
 
 /////
 int verifyFieldName(char **fieldName, int N){
