@@ -1,5 +1,5 @@
-#define FPARSER 1
 ////
+#define FPARSER 1
 /* FUNÇÕES AUXILIARES DO INTERPRETADOR DE COMANDOS (yacc + lex)
  * O yacc vai chamando essas funções conforme vai identificando os tokens.
  * Essas funcções irão preencher uma estrutura, ou parte dela, e chamarão
@@ -141,4 +141,14 @@ char getMode();
 * Realiza operações antes de finalizar o programa 
 * op1: grava o histórico
 */
+
+/*
+ * Guarda o nome da variável global ColumnName
+ */
+void setUpdateColumnName(char *name);
+/*
+ * Armazena o nome da coluna e o valor
+ */
+void setUpdateColumnValue(char *value, char type);
+
 void quit(int flag);

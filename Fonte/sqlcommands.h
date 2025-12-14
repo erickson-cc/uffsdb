@@ -103,7 +103,7 @@ int iniciaAtributos(struct fs_objects *, tp_table **, tp_buffer **, char *);
     Parametros: Nome da Tabela, Objeto da Tabela e tabela.
     Retorno:    tp_table
    ---------------------------------------------------------------------------------------------*/
-int op_update();
+void op_update(Lista *tuplas, char *nomeTabela, rc_insert *newData);
 /* ----------------------------------------------------------------------------------------------
     Objetivo:   
     Parametros: 

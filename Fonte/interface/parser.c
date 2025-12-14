@@ -42,6 +42,8 @@ inf_query QUERY;
  */
 rc_parser GLOBAL_PARSER;
 
+char global_temp_col_name[200];
+
 void connect(char *nome) {
   int r = connectDB(nome);
 	if (r == SUCCESS) {
@@ -133,6 +135,7 @@ void setValueInsert(char *nome, char type) {
     GLOBAL_PARSER.val_count++;
 }
 
+/*
 void setUpdateValue(char *columnName, char *value, char type) {
     GLOBAL_DATA.columnName = uffsRealloc(GLOBAL_DATA.columnName, (GLOBAL_PARSER.col_count+1)*sizeof(char *));
     GLOBAL_DATA.values     = uffsRealloc(GLOBAL_DATA.values, (GLOBAL_PARSER.val_count+1)*sizeof(char *));
@@ -153,6 +156,35 @@ void setUpdateValue(char *columnName, char *value, char type) {
     GLOBAL_PARSER.col_count++;
     GLOBAL_PARSER.val_count++;
 }
+*/
+void setUpdateColumnName(char *name) {
+	// Guarda o nome da coluna para usar depois
+	strcpylower(global_temp_col_name, name);
+}
+
+void setUpdateColumnValue(char *value, char type) {
+	GLOBAL_DATA.columnName	= uffsRealloc(GLOBAL_DATA.columnName, (GLOBAL_PARSER.col_count+1)*sizeof(char *));
+	GLOBAL_DATA.values	= uffsRealloc(GLOBAL_DATA.values, (GLOBAL_PARSER.val_count+1)*sizeof(char *));
+	GLOBAL_DATA.type	= uffsRealloc(GLOBAL_DATA.type, (GLOBAL_PARSER.val_count+1)*sizeof(char));
+
+	GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = uffslloc(sizeof(char)*(strlen(global_temp_col_name)+1));
+	strcpylower(GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count], global_temp_col_name);
+
+	GLOBAL_DATA.values[GLOBAL_PARSER.val_count] = uffslloc(sizeof(char)*(strlen(value)+1));
+
+	if (type == 'S') {
+		strncpy(GLOBAL_DATA.values[GLOBAL_PARSER.val_count], value+1, strlen(value)-2);
+		GLOBAL_DATA.values[GLOBAL_PARSER.val_count][strlen(value)-2] = '\0';
+	}
+	else {
+		strcpy(GLOBAL_DATA.values[GLOBAL_PARSER.val_count], value);
+	}
+
+	GLOBAL_DATA.type[GLOBAL_PARSER.val_count] = type;
+	GLOBAL_PARSER.col_count++;
+	GLOBAL_PARSER.val_count++;
+}
+
 
 void setColumnCreate(char **nome) {
     GLOBAL_DATA.columnName  = uffsRealloc(GLOBAL_DATA.columnName, (GLOBAL_PARSER.col_count+1)*sizeof(char *));

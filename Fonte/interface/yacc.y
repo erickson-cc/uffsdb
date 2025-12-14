@@ -25,7 +25,8 @@
    #include "parser.h"
 #endif
 
-extern char* yytext[];
+//extern char* yytext[];
+extern char *yytext;
 extern FILE * yyin;
 extern FILE* outFile_p;
 
@@ -63,7 +64,7 @@ start: insert | select | delete | update | create_table | create_database | drop
 /*--------------------------------------------------*/
 
 /* CONNECTION */
-connection: CONNECT OBJECT {connect(*yytext); GLOBAL_PARSER.consoleFlag = 1; return 0;};
+connection: CONNECT OBJECT {connect(yytext); GLOBAL_PARSER.consoleFlag = 1; return 0;};
 
 qualquer_coisa: OBJECT {GLOBAL_PARSER.consoleFlag = 1; GLOBAL_PARSER.noerror = 0; return 0;};
 
@@ -135,13 +136,13 @@ insert: INSERT INTO {setMode(OP_INSERT);} table opt_column_list VALUES parentesi
 
 semicolon: ';';
 
-table: OBJECT {setObjName(yytext);};
+table: OBJECT {setObjName(&yytext);};
 
 opt_column_list: /*optional*/ | parentesis_open column_list parentesis_close;
 
 column_list: column | column ',' column_list;
 
-column: OBJECT {setColumnInsert(yytext);};
+column: OBJECT {setColumnInsert(&yytext);};
 
 value_list: value | value ',' value_list;
 
@@ -167,40 +168,41 @@ type: INTEGER {setColumnTypeCreate('I');}
     | DOUBLE {setColumnTypeCreate('D');};
     | CHAR {setColumnTypeCreate('C');};
 
-column_create: OBJECT {setColumnCreate(yytext);};
+column_create: OBJECT {setColumnCreate(&yytext);};
 
 attribute: /*optional*/
          | PRIMARY KEY {setColumnPKCreate();}
          | REFERENCES table_fk ABRE_P column_fk FECHA_P;
 
-table_fk: OBJECT {setColumnFKTableCreate(yytext);};
+table_fk: OBJECT {setColumnFKTableCreate(&yytext);};
 
-column_fk: OBJECT {setColumnFKColumnCreate(yytext);};
+column_fk: OBJECT {setColumnFKColumnCreate(&yytext);};
 
-/* UPDATE */  /*tentei ver oq fazia sentido team09 */
-/* Tarefa team9: 	criar uma regra específica para os valroes do update (value_update) e passar os argumentos*/
-			/*corretamente para setUpdateValue;	*/
-			/*o yacc processa de baixo para cima, logo o value não sabe qual é a colua OBJECT*/
-		
-update: UPDATE {setMode(OP_UPDATE); resetQuery();} table_query SET set_list where semicolon { return 0; };
+/* UPDATE */
+update: UPDATE {setMode(OP_UPDATE); resetQuery();} table_query SET set_list where semicolon { 
+      GLOBAL_DATA.N = GLOBAL_PARSER.col_count;
+      return 0; };
 set_list: set_item | set_item ',' set_list;
 
-set_item: OBJECT '=' value {setUpdateValue(yylval.strval, /* value and type */);};
+set_item:
+	  coluna_update RELACIONAL valor_update_int
+	| coluna_update RELACIONAL valor_update_double
+	| coluna_update RELACIONAL valor_update_string
+	;
+coluna_update: OBJECT {setUpdateColumnName(yytext);};
 
-value: VALUE {setUpdateValue(/* column name */, yylval.strval, 'D');}
-     | NUMBER {setUpdateValue(/* column name */, yylval.strval, 'I');}
-     | STRING {setUpdateValue(/* column name */, yylval.strval, 'S');};
-
-
+valor_update_int:	NUMBER	{setUpdateColumnValue(yytext, 'I');};
+valor_update_double:	VALUE	{setUpdateColumnValue(yytext, 'D');};
+valor_update_string:	STRING	{setUpdateColumnValue(yytext, 'S');};
 
 /* DROP TABLE */
-drop_table: DROP TABLE {setMode(OP_DROP_TABLE);} OBJECT {setObjName(yytext);} semicolon  {return 0;};
+drop_table: DROP TABLE {setMode(OP_DROP_TABLE);} OBJECT {setObjName(&yytext);} semicolon  {return 0;};
 
 /* CREATE DATABASE */
-create_database: CREATE DATABASE {setMode(OP_CREATE_DATABASE);} OBJECT {setObjName(yytext);} semicolon {return 0;};
+create_database: CREATE DATABASE {setMode(OP_CREATE_DATABASE);} OBJECT {setObjName(&yytext);} semicolon {return 0;};
 
 /* DROP DATABASE */
-drop_database: DROP DATABASE {setMode(OP_DROP_DATABASE);} OBJECT {setObjName(yytext);} semicolon {return 0;};
+drop_database: DROP DATABASE {setMode(OP_DROP_DATABASE);} OBJECT {setObjName(&yytext);} semicolon {return 0;};
 
 /* SELECT */
 select: SELECT {setMode(OP_SELECT); resetQuery();} projecao
@@ -224,7 +226,7 @@ logicos: relacoes repLogicos
 adc_abre_p: ABRE_P {adcTokenWhere(yylval.strval,5);}
 
 repLogicos: /* epsilon */
-          | LOGICO {adcTokenWhere(*yytext,1);} logicos
+          | LOGICO {adcTokenWhere(yytext,1);} logicos
 
 relacoes: operacao RELACIONAL {adcTokenWhere(yylval.strval,2);} operacao
 
@@ -240,7 +242,7 @@ operador: ASTERISCO {adcTokenWhere(yylval.strval,4);}
         | OPERADOR {adcTokenWhere(yylval.strval,4);}
         | sinal
 
-sinal: '-' {adcTokenWhere(*yytext,3);} | '+' {adcTokenWhere(*yytext,3);}
+sinal: '-' {adcTokenWhere(yytext,3);} | '+' {adcTokenWhere(yytext,3);}
 
 operando: sinal VALUE {adcTokenWhere(yylval.strval,9);} | sinal NUMBER {adcTokenWhere(yylval.strval,9);}
         | VALUE {adcTokenWhere(yylval.strval,9);} | NUMBER {adcTokenWhere(yylval.strval,9);}
@@ -250,7 +252,7 @@ create_index: CREATE INDEX ON {setMode(OP_CREATE_INDEX);} table parentesis_open 
     return 0;
 };
 
-atributo: OBJECT {setColumnBtreeCreate(yytext);}
+atributo: OBJECT {setColumnBtreeCreate(&yytext);}
 
 /* DELETE */
 delete: DELETE FROM {setMode(OP_DELETE); resetQuery();} table_query where semicolon { return 0; };

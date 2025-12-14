@@ -1165,7 +1165,7 @@ int excluirTabela(char *nomeTabela) {
     Estrutura: UPDATE nomeTabela SET nomeCampo = valorCampo WHERE campoCondicao = valorCondicao      
    ---------------------------------------------------------------------------------------------*/
 void op_update(Lista *tuplas, char *nomeTabela, rc_insert *newData){
-	if (!tuplas || !tuplas->tamp){
+	if (!tuplas || !tuplas->tam){
 		printf("0 rows updated.\n");
 		return; // troquei para void
 	}
@@ -1184,35 +1184,40 @@ void op_update(Lista *tuplas, char *nomeTabela, rc_insert *newData){
 	for (Nodo *n = tuplas->prim; n; n = n->prox) {
 		tupla *t_ref = (tupla *)n->inf; // Tupla de referência (tem offset e page)
 		// Localiza a tupla real no buffer
-		tupla *t_buffer = &buffer[t_ref->bufferPage].data[t_ref->offset]; // Lógica ilustrativa, verificar struct buffer
+		char *tuplePtr = buffer[t_ref->bufferPage].data + t_ref->offset;
 
 		// Aplica as mudanças solicitadas no SET
 		for (int i = 0; i < newData->N; i++) {
-			// Procurar qual coluna do esquema corresponde a newData->columnName[i]
-			if (strcmp(esquema[j].nome, newData->columnName[i]) == 0) {
-				// Tarefa team9: criar a função calculaTamanhoTupla
-				// Descrição: 	a função vai retornar o offset de cada campo dentro da tupla
-				// 		iterar cada campo somando os tamanhos
-				if (esquema[j].tipo == 'S') {
-					memset(tuplePtr+calculaTamanhoTupla(esquema, j), 0, esquema[j].tam);
-					strncpy(tuplePtr+calculaTamanhoTupla(esquema, j), newData->values[i], esquema[j].tam);
+			int currentOffset = 1; // COmeça em 1 para pular o byte da flag
+			for (int j = 0;  j < obj.qtdCampos; j++){
+
+				// Procurar qual coluna do esquema corresponde a newData->columnName[i]
+				if (strcmp(esquema[j].nome, newData->columnName[i]) == 0) {
+					// Tarefa team9: criar a função calculaTamanhoTupla
+					// Descrição: 	a função vai retornar o offset de cada campo dentro da tupla
+					// 		iterar cada campo somando os tamanhos
+					if (esquema[j].tipo == 'S') {
+						memset(tuplePtr+currentOffset, 0, esquema[j].tam);
+						strncpy(tuplePtr+currentOffset, newData->values[i], esquema[j].tam);
+					}
+					else if (esquema[j].tipo == 'I'){
+						int valor = atoi(newData->values[i]);
+						memcpy(tuplePtr+currentOffset, &valor, sizeof(int));
+					}
+					else if (esquema[j].tipo == 'D'){
+						double valor = atof(newData->values[i]);
+						memcpy(tuplePtr+currentOffset, &valor, sizeof(double));
+					}
+					else if (esquema[j].tipo == 'C'){
+						char valor = newData->values[i][0];
+						memcpy(tuplePtr+currentOffset, &valor, sizeof(char));
+					}
 				}
-				else if (esquema[j].tipo == 'I'){
-					int valor = atoi(newData->values[i]);
-					memcpy(tuplePtr+calculaTamanhoTupla(esquema, j), &valor, sizeof(int));
-				}
-				else if (esquema[j].tipo == 'D'){
-					double valor = atof(newData->values[i]);
-					memcpy(tuplePtr+calculaTamanhoTupla(esquema, j), &valor, sizeof(double));
-				}
-				else if (esquema[j].tipo == 'C'){
-					char valor = newData->values[i][0];
-					memcpy(tuplePtr+calculaTamanhoTupla(esquema, j), &valor, sizeof(char));
-				}
+				currentOffset += esquema[j].tam;
 			}
 		}
-	buffer[t_ref->bufferPage].db = 1; // dirty_bit
-        count++;
+		buffer[t_ref->bufferPage].db = 1; // dirty_bit
+		count++;
 	}
 	for(int p=0; p < PAGES; p++) {
 		if(buffer[p].db) {
