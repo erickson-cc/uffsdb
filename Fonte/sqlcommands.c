@@ -1227,8 +1227,14 @@ void op_update(Lista *tuplas, char *nomeTabela, rc_insert *newData){
 	}
     
 	printf("UPDATE %d\n", count);
-	// Tarefa team9: colocar um free aqui ;
-	// Descrição: Talvez não seja necessário (procurar bugs)
+	
+	// Liberar memória do buffer
+    for(int p = 0; p < PAGES; p++) {
+        free(buffer[p].data);
+    }
+    free(buffer);
+    // Liberar memória do esquema
+    free(esquema);
 
 }
 
