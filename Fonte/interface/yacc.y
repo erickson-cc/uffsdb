@@ -50,7 +50,7 @@ int yywrap() {
         CLEAR       CONTR       WHERE       OPERADOR    RELACIONAL
         LOGICO      ASTERISCO   SINAL       FECHA_P     ABRE_P
         STRING      INDEX       ON          IMPLEMENT   HISTORY 
-        DELETE      DELETE_HISTORY;
+        DELETE      DELETE_HISTORY          UPDATE	SET;
 %%
 start: insert | select | delete | update | create_table | create_database | drop_table | drop_database
      | table_attr | list_tables | connection | exit_program | semicolon {GLOBAL_PARSER.consoleFlag = 1; return 0;}
@@ -178,6 +178,10 @@ table_fk: OBJECT {setColumnFKTableCreate(yytext);};
 column_fk: OBJECT {setColumnFKColumnCreate(yytext);};
 
 /* UPDATE */  /*tentei ver oq fazia sentido team09 */
+/* Tarefa team9: 	criar uma regra específica para os valroes do update (value_update) e passar os argumentos*/
+			/*corretamente para setUpdateValue;	*/
+			/*o yacc processa de baixo para cima, logo o value não sabe qual é a colua OBJECT*/
+		
 update: UPDATE {setMode(OP_UPDATE); resetQuery();} table_query SET set_list where semicolon { return 0; };
 set_list: set_item | set_item ',' set_list;
 

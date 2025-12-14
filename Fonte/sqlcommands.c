@@ -1162,14 +1162,69 @@ int excluirTabela(char *nomeTabela) {
     Objetivo:   Função para ATUALIZAR de tabelas. (UPDATE)
     Parametros: Objeto da Tabela, Nome da tabela (char), Objeto
     Retorno:    
-                
+    Estrutura: UPDATE nomeTabela SET nomeCampo = valorCampo WHERE campoCondicao = valorCondicao      
    ---------------------------------------------------------------------------------------------*/
-int atualizarTabela(char *nomeTabela, char *nomeCampo, char *valorCampo, char *campoCondicao, char *valorCondicao){
-	//Implementar abaixo a lógica
-	//UPDATE nomeTabela SET nomeCampo = valorCampo WHERE campoCondicao = valorCondicao
-	//
+void op_update(Lista *tuplas, char *nomeTabela, rc_insert *newData){
+	if (!tuplas || !tuplas->tamp){
+		printf("0 rows updated.\n");
+		return; // troquei para void
+	}
+	struct  fs_objects obj = leObjeto(nomeTabela);
+	tp_table *esquema = leSchema(obj);
+	tp_buffer *buffer = initbuffer();
 
-	return 1;
+	// Carregar buffer
+	int erro, x = 0;
+	do {
+		erro = colocaTuplaBuffer(buffer, x++, esquema, obj);
+	} while(erro == SUCCESS);
+
+	int count = 0;
+	// Itera sobre as tuplas encontradas pelo WHERE
+	for (Nodo *n = tuplas->prim; n; n = n->prox) {
+		tupla *t_ref = (tupla *)n->inf; // Tupla de referência (tem offset e page)
+		// Localiza a tupla real no buffer
+		tupla *t_buffer = &buffer[t_ref->bufferPage].data[t_ref->offset]; // Lógica ilustrativa, verificar struct buffer
+
+		// Aplica as mudanças solicitadas no SET
+		for (int i = 0; i < newData->N; i++) {
+			// Procurar qual coluna do esquema corresponde a newData->columnName[i]
+			if (strcmp(esquema[j].nome, newData->columnName[i]) == 0) {
+				// Tarefa team9: criar a função calculaTamanhoTupla
+				// Descrição: 	a função vai retornar o offset de cada campo dentro da tupla
+				// 		iterar cada campo somando os tamanhos
+				if (esquema[j].tipo == 'S') {
+					memset(tuplePtr+calculaTamanhoTupla(esquema, j), 0, esquema[j].tam);
+					strncpy(tuplePtr+calculaTamanhoTupla(esquema, j), newData->values[i], esquema[j].tam);
+				}
+				else if (esquema[j].tipo == 'I'){
+					int valor = atoi(newData->values[i]);
+					memcpy(tuplePtr+calculaTamanhoTupla(esquema, j), &valor, sizeof(int));
+				}
+				else if (esquema[j].tipo == 'D'){
+					double valor = atof(newData->values[i]);
+					memcpy(tuplePtr+calculaTamanhoTupla(esquema, j), &valor, sizeof(double));
+				}
+				else if (esquema[j].tipo == 'C'){
+					char valor = newData->values[i][0];
+					memcpy(tuplePtr+calculaTamanhoTupla(esquema, j), &valor, sizeof(char));
+				}
+			}
+		}
+	buffer[t_ref->bufferPage].db = 1; // dirty_bit
+        count++;
+	}
+	for(int p=0; p < PAGES; p++) {
+		if(buffer[p].db) {
+			//Escrever no disco
+			writeBufferToDisk(buffer, &obj, p, buffer[p].nrec*tamTupla(esquema,obj));
+		}
+	}
+    
+	printf("UPDATE %d\n", count);
+	// Tarefa team9: colocar um free aqui ;
+	// Descrição: Talvez não seja necessário (procurar bugs)
+
 }
 
 /////

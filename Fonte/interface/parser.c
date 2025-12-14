@@ -29,7 +29,7 @@
 #endif
 
 /* Estrutura global que guarda as informações obtidas pelo yacc
- * na identificação dos tokens
+*na identificação dos tokens
  */
 rc_insert GLOBAL_DATA;
 
@@ -134,7 +134,24 @@ void setValueInsert(char *nome, char type) {
 }
 
 void setUpdateValue(char *columnName, char *value, char type) {
-   //helper function do update team09 
+    GLOBAL_DATA.columnName = uffsRealloc(GLOBAL_DATA.columnName, (GLOBAL_PARSER.col_count+1)*sizeof(char *));
+    GLOBAL_DATA.values     = uffsRealloc(GLOBAL_DATA.values, (GLOBAL_PARSER.val_count+1)*sizeof(char *));
+    GLOBAL_DATA.type       = uffsRealloc(GLOBAL_DATA.type, (GLOBAL_PARSER.val_count+1)*sizeof(char));
+
+    GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count] = uffslloc(sizeof(char)*(strlen(columnName)+1)); // Armazenar o 
+    strcpylower(GLOBAL_DATA.columnName[GLOBAL_PARSER.col_count], columnName);			//nome da coluna
+
+    GLOBAL_DATA.values[GLOBAL_PARSER.val_count] = uffslloc(sizeof(char)*(strlen(value)+1)); //Armazenar o valor
+    if (type == 'S') { // Remover aspas
+        strncpy(GLOBAL_DATA.values[GLOBAL_PARSER.val_count], value+1, strlen(value) - 2);
+        GLOBAL_DATA.values[GLOBAL_PARSER.val_count][strlen(value)-2] = '\0';
+    } else {
+        strcpy(GLOBAL_DATA.values[GLOBAL_PARSER.val_count], value);
+    }
+
+    GLOBAL_DATA.type[GLOBAL_PARSER.val_count] = type;
+    GLOBAL_PARSER.col_count++;
+    GLOBAL_PARSER.val_count++;
 }
 
 void setColumnCreate(char **nome) {
@@ -259,7 +276,7 @@ int interface() {
     pthread_create(&pth, NULL, (void*)clearGlobalStructs, NULL);
     pthread_join(pth, NULL);
 
-    char prompt[LEN_DB_NAME + 4]; // 3 para "=# " +1 para \0
+    char prompt[LEN_DB_NAME+4]; // 3 para "=# " +1 para \0
     Lista *resultado;
     connect("uffsdb"); // conecta automaticamente no banco padrão
     QUERY.tok = QUERY.proj = NULL;
@@ -322,10 +339,6 @@ int interface() {
                             break;
                         case OP_CREATE_DATABASE:
                             createDB(GLOBAL_DATA.objName);
-                            break;
-                        case OP_UPDATE:
-                            // fazer alguma tratativa para o update
-			    atualizarTabela(GLOBAL_DATA.objName);
                             break;
                         case OP_DROP_TABLE:
                             excluirTabela(GLOBAL_DATA.objName);
